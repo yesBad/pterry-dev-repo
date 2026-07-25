@@ -13,7 +13,7 @@ if [ -z ${AUTO_UPDATE} ] || [ "${AUTO_UPDATE}" == "1" ]; then
     	#[[ -n "${SRCDS_BETAPW:-}" ]] && args+=(-branchpassword "${SRCDS_BETAPW}")
     	./DepotDownloader/DepotDownloader -app 258550 "${args[@]}" -dir /home/container -os linux -validate
 	else
-		echo -e "Using SteamCMD; consider upgrading the egg?"
+		echo -e "Using SteamCMD"
 		[[ -n "${SRCDS_BETAID:-}" ]] && args+=(-beta "${SRCDS_BETAID}")
     	[[ -n "${SRCDS_BETAPW:-}" ]] && args+=(-betapassword "${SRCDS_BETAPW}")
 		./steamcmd/steamcmd.sh +force_install_dir /home/container +login anonymous +app_update 258550 "${args[@]}" +quit
