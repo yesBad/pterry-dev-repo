@@ -5,6 +5,8 @@ cd /home/container
 export INTERNAL_IP=`ip route get 1 | awk '{print $(NF-2);exit}'`
 
 if [ -z ${AUTO_UPDATE} ] || [ "${AUTO_UPDATE}" == "1" ]; then
+	echo -e "Beta: ${SRCDS_BETAID}"
+	echo -e "Beta password: ${SRCDS_BETAPW}"
 	if [ -f "./DepotDownloader/DepotDownloader" ] && [ -z "${SRCDS_BETAID}" ]; then
 		echo -e "Using DepotDownloader"
     	#[[ -n "${SRCDS_BETAID:-}" ]] && args+=(-branch "${SRCDS_BETAID}")
