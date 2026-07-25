@@ -4,7 +4,7 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2026-07-11T20:16:43+00:00",
+    "exported_at": "2026-07-25T19:08:05+00:00",
     "name": "Rust",
     "author": "support@pterodactyl.io",
     "description": "The only aim in Rust is to survive. To do this you will need to overcome struggles such as hunger, thirst and cold. Build a fire. Build a shelter. Kill animals for meat. Protect yourself from other players, and kill them for meat. Create alliances with other players and form a town. Do whatever it takes to survive.",
@@ -12,7 +12,7 @@
         "steam_disk_space"
     ],
     "docker_images": {
-        "ghcr.io\/yesbad\/pterry-dev-repo:rust-latest": "ghcr.io\/yesbad\/pterry-dev-repo:rust-latest"
+        "github.com\/yesBad": "ghcr.io\/yesbad\/pterry-dev-repo:rust-latest"
     },
     "file_denylist": [],
     "startup": ".\/RustDedicated -batchmode +server.port {{SERVER_PORT}} +server.queryport {{QUERY_PORT}} +server.identity \"rust\" +rcon.ip 0.0.0.0 +rcon.port {{RCON_PORT}} +rcon.web true +server.hostname \\\"{{HOSTNAME}}\\\" +server.level \\\"{{LEVEL}}\\\" +server.description \\\"{{DESCRIPTION}}\\\" +server.url \\\"{{SERVER_URL}}\\\" +server.headerimage \\\"{{SERVER_IMG}}\\\" +server.maxplayers {{MAX_PLAYERS}} +rcon.password \\\"{{RCON_PASS}}\\\" +app.port {{APP_PORT}} +server.logoimage {{SERVER_LOGO}} +server.saveinterval {{SAVEINTERVAL}} $( [ -z ${MAP_URL} ] && printf %s \"+server.worldsize \\\"{{WORLD_SIZE}}\\\" +server.seed \\\"$( if [ -f seed.txt ] && [[ ${WORLD_SEED} == \"0\" ]]; then printf %s $(cat seed.txt); else printf %s ${WORLD_SEED}; fi )\\\"\"|| printf %s \"+server.levelurl {{MAP_URL}}\" ) {{ADDITIONAL_ARGS}}",
@@ -24,7 +24,7 @@
     },
     "scripts": {
         "installation": {
-            "script": "if [ ${REGEN_SERVER} == \"1\" ]; then\r\n    cd \/mnt\/server\/\r\n    rm -rf ${REMOVE_FILES}\r\nfi\r\n\r\nif [ $WORLD_SEED == \"0\" ]; then\r\n    if [ ! -f \/mnt\/server\/seed.txt ]; then\r\n        rm -f \/mnt\/server\/seed.txt\r\n    fi\r\n    cat \/dev\/urandom | tr -dc '1-9' | fold -w 5 | head -n 1 > \/mnt\/server\/seed.txt\r\nfi\r\n\r\ncd \/tmp\r\nmkdir -p \/mnt\/server\/DepotDownloader\r\ncurl -sSL \\\r\n    -o \/tmp\/depotdownloader.zip \\\r\n    https:\/\/github.com\/SteamRE\/DepotDownloader\/releases\/latest\/download\/DepotDownloader-linux-x64.zip\r\n\r\nunzip -oq \/tmp\/depotdownloader.zip -d \/mnt\/server\/DepotDownloader\r\nchmod +x \/mnt\/server\/DepotDownloader\/DepotDownloader\r\ncd \/mnt\/server\/DepotDownloader\r\nexport HOME=\/mnt\/server\r\n\r\nARGS=(-app \"$SRCDS_APPID\" -dir \/mnt\/server -os linux -validate)\r\n\r\n[[ -n \"$SRCDS_BETAID\" ]] && ARGS+=(-branch \"$SRCDS_BETAID\")\r\n[[ -n \"$SRCDS_BETAPW\" ]] && ARGS+=(-branchpassword \"$SRCDS_BETAPW\")\r\n\r\n.\/DepotDownloader \"${ARGS[@]}\"\r\nchmod +x \/mnt\/server\/RustDedicated",
+            "script": "if [ ${REGEN_SERVER} == \"1\" ]; then\r\n    cd \/mnt\/server\/\r\n    rm -rf ${REMOVE_FILES}\r\nfi\r\n\r\nif [ $WORLD_SEED == \"0\" ]; then\r\n    if [ ! -f \/mnt\/server\/seed.txt ]; then\r\n        rm -f \/mnt\/server\/seed.txt\r\n    fi\r\n    cat \/dev\/urandom | tr -dc '1-9' | fold -w 5 | head -n 1 > \/mnt\/server\/seed.txt\r\nfi\r\n\r\ncd \/tmp\r\nmkdir -p \/mnt\/server\/DepotDownloader\r\ncurl -sSL \\\r\n    -o \/tmp\/depotdownloader.zip \\\r\n    https:\/\/github.com\/SteamRE\/DepotDownloader\/releases\/latest\/download\/DepotDownloader-linux-x64.zip\r\n\r\nunzip -oq \/tmp\/depotdownloader.zip -d \/mnt\/server\/DepotDownloader\r\nchmod +x \/mnt\/server\/DepotDownloader\/DepotDownloader\r\n\r\nmkdir -p \/mnt\/server\/steamcmd\r\ncurl -sSL -o steamcmd.tar.gz https:\/\/steamcdn-a.akamaihd.net\/client\/installer\/steamcmd_linux.tar.gz\r\ntar -xzvf steamcmd.tar.gz -C \/mnt\/server\/steamcmd\r\nmkdir -p \/mnt\/server\/steamapps\r\n\r\nchown -R root:root \/mnt\r\nexport HOME=\/mnt\/server\r\n\r\nARGS=(-app \"$SRCDS_APPID\" -dir \/mnt\/server -os linux -validate)\r\n\r\n[[ -n \"$SRCDS_BETAID\" ]] && ARGS+=(-branch \"$SRCDS_BETAID\")\r\n[[ -n \"$SRCDS_BETAPW\" ]] && ARGS+=(-branchpassword \"$SRCDS_BETAPW\")\r\n\r\necho -e \"Beta: ${SRCDS_BETAID}\"\r\necho -e \"Beta password: ${SRCDS_BETAPW}\"\r\n\r\nif [ -n \"${SRCDS_BETAID}\" ]; then\r\n    echo -e \"using steamcmd\"\r\n    cd \/mnt\/server\/steamcmd\r\n    .\/steamcmd.sh +force_install_dir \/mnt\/server +login anonymous +app_update ${SRCDS_APPID} $( [[ -z ${SRCDS_BETAID} ]] || printf %s \"-beta ${SRCDS_BETAID}\" ) $( [[ -z ${SRCDS_BETAPW} ]] || printf %s \"-betapassword ${SRCDS_BETAPW}\" ) validate +quit\r\n    else\r\n    echo -e \"using depotdownloader\"\r\n    cd \/mnt\/server\/DepotDownloader\r\n    .\/DepotDownloader \"${ARGS[@]}\"\r\nfi\r\n\r\nchmod +x \/mnt\/server\/RustDedicated",
             "container": "ghcr.io\/yesbad\/pterry-dev-repo:debian",
             "entrypoint": "bash"
         }
